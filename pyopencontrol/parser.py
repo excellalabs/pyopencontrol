@@ -4,8 +4,10 @@ from openpyxl import load_workbook
 import os.path
 import wget
 
-DEFAULT_FILENAME='FedRAMP-Moderate-HHH-Baseline-Controls-2016-05-18.xlsx'
-DEFAULT_INPUT_XLSX='https://s3.amazonaws.com/sitesusa/wp-content/uploads/sites/482/2016/07/{}'.format(DEFAULT_FILENAME)
+DEFAULT_FILENAME = 'FedRAMP-Moderate-HHH-Baseline-Controls-2016-05-18.xlsx'
+DEFAULT_INPUT_XLSX = 'https://s3.amazonaws.com/sitesusa/wp-content/uploads/sites/482/2016/07/{}'.format(DEFAULT_FILENAME)
+
+INJECT_CM_3_2 = True
 
 class Control(object):
     def __init__(self, id, name, text):
@@ -24,7 +26,6 @@ def _find_or_get_file(filename, url):
         print('Downloading...')
 
         #response = requests.get(url, stream=True)
-        import pdb; pdb.set_trace()
         wget.download(url, out=filename)
         #with open('./{}'.format(filename), 'wb') as f:
         #    f.write(response.content)
@@ -93,6 +94,18 @@ def _get_controls():
         if key_count == 1:
             raise Exception("weird, only one match for {}".format(control))
         controls[control] = new_control
+
+        if INJECT_CM_3_2 and new_control.id == 'CM-3':
+            # CM-3 (2) is missing from the 2016-05-18 doc
+            control = 'CM-3 (2)'
+            title = 'CONFIGURATION CHANGE CONTROL TEST / VALIDATE / DOCUMENT CHANGES'
+            text = '''The organization tests, validates, and documents changes to the information system before implementing the changes on the operational system.
+
+Supplemental Guidance: Changes to information systems include modifications to hardware, software, or firmware components and configuration settings defined in CM-6. Organizations ensure that testing does not interfere with information system operations. Individuals/groups conducting tests understand organizational security policies and procedures, information system security policies and procedures, and the specific health, safety, and environmental risks associated with particular facilities/processes. Operational systems may need to be taken off-line, or replicated to the extent feasible, before testing can be conducted. If information systems must be taken off-line for testing, the tests are scheduled to occur during planned system outages whenever possible. If testing cannot be conducted on operational systems, organizations employ compensating controls (e.g., testing on replicated systems).'''
+            cm_3_2_control = Control(control, title, text)
+            cm_3_2_control.narrative_keys.append(control)
+            controls[control] = cm_3_2_control
+
     return controls
 
 def parse(filename=DEFAULT_FILENAME, url=DEFAULT_INPUT_XLSX):
