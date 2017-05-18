@@ -14,7 +14,7 @@ setup(
         'Programming Language :: Python :: 3.5',
         'Programming Language :: Python :: 3.6',
     ],
-    keywords = 'opencontrol'
+    keywords = 'opencontrol',
     packages = find_packages(),
     install_requires = [
         'openpyxl>=2.4.7',
