@@ -55,19 +55,42 @@ def _get_controls():
         # 8 LM Additional FedRAMP Requirements and Guidance
         # 9 Parameter,
 
-        isKeys = 0
+        key_count = 0
+        last_key = None
         for line in text.splitlines():
             matchObj = re.match(r'\s{0,2}([a-z])\.\s.+', line)
             matchObj2 = re.match(r'\s{0,2}\(([a-z])\)\s.+', line)
+            currentKey = None
             if matchObj:
-                isKeys = isKeys + 1
-                new_control.narrative_keys.append(matchObj.group(1))
+                currentKey = matchObj.group(1)
             elif matchObj2:
-                isKeys = isKeys + 1
-                new_control.narrative_keys.append(matchObj2.group(1))
-        if isKeys < 1:
+                currentKey = matchObj2.group(1)
+            if currentKey:
+                key_count += 1
+                last_key = currentKey
+                new_control.narrative_keys.append(currentKey)
+        if last_key:
+            # Some controls embed the last key without a newline.
+            # For example, SA-5
+            # let's see if another key exists.
+            # TODO reduce duplicate code
+            key_after_last = chr(ord(last_key) + 1)
+            for line in text.splitlines():
+                matchObj = re.match(r'.+\sand\s([{}])\.\s.+'.format(key_after_last), line)
+                matchObj2 = re.match(r'.+\sand\s\(([{}])\)\s.+'.format(key_after_last), line)
+                currentKey = None
+                if matchObj:
+                    currentKey = matchObj.group(1)
+                elif matchObj2:
+                    currentKey = matchObj2.group(1)
+                if currentKey:
+                    key_count += 1
+                    last_key = currentKey
+                    new_control.narrative_keys.append(currentKey)
+
+        if key_count < 1:
             new_control.narrative_keys.append(control)
-        if isKeys == 1:
+        if key_count == 1:
             raise Exception("weird, only one match for {}".format(control))
         controls[control] = new_control
     return controls
