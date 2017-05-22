@@ -5,7 +5,7 @@ from setuptools import setup, find_packages
 setup(
     name = "pyopencontrol",
     description = "Generate opencontrol compliant yaml",
-    version = "0.0.1",
+    version = "0.0.2",
     license = "MIT",
     classifiers = [
         'License :: OSI Approved :: MIT License',
