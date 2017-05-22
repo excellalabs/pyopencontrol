@@ -20,4 +20,6 @@ setup(
         'openpyxl>=2.4.7',
         'wget>=3.2',
     ],
+    setup_requires=['pytest-runner'],
+    tests_require=['pytest'],
 )
