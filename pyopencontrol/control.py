@@ -5,7 +5,7 @@ class Control(object):
         self.sortid = sortid
         self.id = id
         self.name = name
-        self.family = name[0:2]
+        self.family = id[0:2]
         self.text = text
         self.narrative_keys = []
         self._parse_narrative_keys()
