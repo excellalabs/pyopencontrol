@@ -3,4 +3,6 @@ __pycache__/
 *.xlsx
 .cache
 .eggs
-venv
+*.egg-info
+*.swp
+venv*
